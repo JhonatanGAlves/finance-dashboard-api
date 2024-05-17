@@ -17,6 +17,7 @@
         "globals": "^15.2.0",
         "husky": "^8.0.3",
         "lint-staged": "^13.2.3",
+        "prettier": "^3.2.5",
         "typescript-eslint": "^7.9.0"
     }
 }
