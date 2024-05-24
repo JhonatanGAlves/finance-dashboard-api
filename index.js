@@ -63,15 +63,9 @@ app.patch('/api/users/update/:userId', async (request, response) => {
 })
 
 app.delete('/api/users/delete/:userId', async (request, response) => {
-    const getUserByIdRepository = new PostgresGetUserByIdRepository()
-    const getUserByIdUseCase = new GetUserByIdUseCase(getUserByIdRepository)
-
     const deleteUserRepository = new PostgresDeleteUserRepository()
     const deleteUserUseCase = new DeleteUserUseCase(deleteUserRepository)
-    const deleteUserController = new DeleteUserController(
-        deleteUserUseCase,
-        getUserByIdUseCase,
-    )
+    const deleteUserController = new DeleteUserController(deleteUserUseCase)
 
     const { statusCode, body } = await deleteUserController.execute(request)
 
