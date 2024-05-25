@@ -18,10 +18,7 @@ export class CreateTransactionController {
             const requiredFields = ['user_id', 'name', 'date', 'amount', 'type']
 
             for (const field of requiredFields) {
-                if (
-                    field !== 'amount' &&
-                    (!params[field] || !params[field].trim().length)
-                ) {
+                if (!params[field] || !params[field].toString().trim().length) {
                     return badRequest({ message: `Missing param: ${field}` })
                 }
             }
