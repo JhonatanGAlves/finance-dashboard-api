@@ -1,9 +1,6 @@
 import validator from 'validator'
-import { badRequest, notFound } from './http.js'
-
-const generateBadRequest = (message) => {
-    return badRequest({ message })
-}
+import { notFound } from './http.js'
+import { generateBadRequest } from './validation.js'
 
 export const invalidPasswordResponse = () => {
     return generateBadRequest('Password must be at least 6 characters')
@@ -11,10 +8,6 @@ export const invalidPasswordResponse = () => {
 
 export const emailAlreadyInUseResponse = () => {
     return generateBadRequest('Invalid e-mail. Please provide a valid one')
-}
-
-export const invalidIdResponse = () => {
-    return generateBadRequest('The provided ID is not valid.')
 }
 
 export const notFoundResponse = () => {
@@ -26,5 +19,3 @@ export const notFoundResponse = () => {
 export const checkIfPasswordIdValid = (password) => password.length > 5
 
 export const checkIfEmailIsValid = (email) => validator.isEmail(email)
-
-export const checkIfIdIsValid = (id) => validator.isUUID(id)
