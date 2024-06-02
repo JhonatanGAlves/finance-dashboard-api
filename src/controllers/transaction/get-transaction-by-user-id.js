@@ -6,9 +6,9 @@ import {
     invalidIdResponse,
 } from '../helpers/index.js'
 
-export class GetTransactionByIdController {
-    constructor(getTransactionByIdUseCase) {
-        this.getTransactionByIdUseCase = getTransactionByIdUseCase
+export class GetTransactionByUserIdController {
+    constructor(getTransactionByUserIdUseCase) {
+        this.getTransactionByUserIdUseCase = getTransactionByUserIdUseCase
     }
 
     async execute(httpRequest) {
@@ -19,9 +19,10 @@ export class GetTransactionByIdController {
                 return invalidIdResponse()
             }
 
-            const transaction = await this.getTransactionByIdUseCase.execute(
-                httpRequest.params.transactionId,
-            )
+            const transaction =
+                await this.getTransactionByUserIdUseCase.execute(
+                    httpRequest.params.transactionId,
+                )
 
             if (!transaction) {
                 return notFound({

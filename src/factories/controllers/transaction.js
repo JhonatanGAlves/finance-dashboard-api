@@ -1,18 +1,18 @@
 import {
     CreateTransactionController,
-    GetTransactionByIdController,
+    GetTransactionByUserIdController,
     UpdateTransactionController,
 } from '../../controllers/transaction/index.js'
 import {
     CreateTransactionUseCase,
     DeleteTransactionUseCase,
-    GetTransactionByIdUseCase,
+    GetTransactionByUserIdUseCase,
     UpdateTransactionUseCase,
 } from '../../use-cases/transaction/index.js'
 import {
     PostgresCreateTransactionRepository,
     PostgresDeleteTransactionRepository,
-    PostgresGetTransactionByIdRepository,
+    PostgresGetTransactionByUserIdRepository,
     PostgresUpdateTransactionRepository,
 } from '../../repositories/postgres/transaction/index.js'
 import { PostgresGetUserByIdRepository } from '../../repositories/postgres/user/index.js'
@@ -33,28 +33,27 @@ export const makeCreateTransactionController = () => {
     return createTransactionController
 }
 
-export const makeGetTransactionByIdController = () => {
-    const getTransactionByIdRepository =
-        new PostgresGetTransactionByIdRepository()
-    const getTransactionByIdUseCase = new GetTransactionByIdUseCase(
-        getTransactionByIdRepository,
+export const makeGetTransactionByUserIdController = () => {
+    const getTransactionByUserIdRepository =
+        new PostgresGetTransactionByUserIdRepository()
+    const getTransactionByUserIdUseCase = new GetTransactionByUserIdUseCase(
+        getTransactionByUserIdRepository,
     )
-    const getTransactionByIdController = new GetTransactionByIdController(
-        getTransactionByIdUseCase,
-    )
+    const getTransactionByUserIdController =
+        new GetTransactionByUserIdController(getTransactionByUserIdUseCase)
 
-    return getTransactionByIdController
+    return getTransactionByUserIdController
 }
 
 export const makeUpdateTransactionController = () => {
     const updateTransactionRepository =
         new PostgresUpdateTransactionRepository()
-    const getTransactionByIdRepository =
-        new PostgresGetTransactionByIdRepository()
+    const getTransactionByUserIdRepository =
+        new PostgresGetTransactionByUserIdRepository()
     const getUserByIdRepository = new PostgresGetUserByIdRepository()
     const updateTransactionUseCase = new UpdateTransactionUseCase(
         updateTransactionRepository,
-        getTransactionByIdRepository,
+        getTransactionByUserIdRepository,
         getUserByIdRepository,
     )
     const updateTransactionController = new UpdateTransactionController(

@@ -10,7 +10,7 @@ import {
 import {
     makeCreateTransactionController,
     makeDeleteTransactionController,
-    makeGetTransactionByIdController,
+    makeGetTransactionByUserIdController,
     makeUpdateTransactionController,
 } from './src/factories/controllers/transaction.js'
 
@@ -56,9 +56,10 @@ app.post('/api/transactions', async (request, response) => {
 })
 
 app.get('/api/transactions/:transactionId', async (request, response) => {
-    const getTransactionByIdController = makeGetTransactionByIdController()
+    const getTransactionByUserIdController =
+        makeGetTransactionByUserIdController()
     const { statusCode, body } =
-        await getTransactionByIdController.execute(request)
+        await getTransactionByUserIdController.execute(request)
 
     return response.status(statusCode).send(body)
 })
