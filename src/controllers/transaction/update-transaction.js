@@ -5,9 +5,7 @@ import {
     checkIfIdIsValid,
     created,
     invalidIdResponse,
-    requiredFieldIsMissingResponse,
     serverError,
-    validateRequiredFields,
 } from '../helpers/index.js'
 import { UserNotFoundError } from '../../errors/user.js'
 
@@ -20,13 +18,16 @@ export class UpdateTransactionController {
         const params = httpRequest.body
 
         try {
-            const requiredFields = ['user_id', 'name', 'date', 'amount', 'type']
+            const allowedFields = ['name', 'date', 'amount', 'type']
 
-            const { ok: requiredFieldsWereProvided, missingField } =
-                validateRequiredFields(params, requiredFields)
+            const someFieldIsNotAllowed = Object.keys(params).some(
+                (field) => !allowedFields.includes(field),
+            )
 
-            if (!requiredFieldsWereProvided) {
-                return requiredFieldIsMissingResponse(missingField)
+            if (someFieldIsNotAllowed) {
+                return badRequest({
+                    message: 'Some provided field is not allowed.',
+                })
             }
 
             const transactionId = httpRequest.params.transactionId
