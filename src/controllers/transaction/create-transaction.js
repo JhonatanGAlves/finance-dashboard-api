@@ -7,6 +7,7 @@ import {
     serverError,
     validateRequiredFields,
 } from '../helpers/index.js'
+import { UserNotFoundError } from '../../errors/user.js'
 
 export class CreateTransactionController {
     constructor(crateTransactionUseCase) {
@@ -14,8 +15,9 @@ export class CreateTransactionController {
     }
 
     async execute(httpRequest) {
+        const params = httpRequest.body
+
         try {
-            const params = httpRequest.body
             const requiredFields = ['user_id', 'name', 'date', 'amount', 'type']
             const { ok: requiredFieldsWereProvided, missingField } =
                 validateRequiredFields(params, requiredFields)
@@ -68,6 +70,11 @@ export class CreateTransactionController {
 
             return created(createdTransaction)
         } catch (error) {
+            if (params.user_id && error instanceof UserNotFoundError) {
+                return badRequest({
+                    message: error.message,
+                })
+            }
             console.error(error)
             return serverError()
         }
