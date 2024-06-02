@@ -10,6 +10,7 @@ import {
 import {
     makeCreateTransactionController,
     makeGetTransactionByIdController,
+    makeUpdateTransactionController,
 } from './src/factories/controllers/transaction.js'
 
 const app = express()
@@ -60,6 +61,17 @@ app.get('/api/transactions/:transactionId', async (request, response) => {
 
     return response.status(statusCode).send(body)
 })
+
+app.patch(
+    '/api/transactions/update/:transactionId',
+    async (request, response) => {
+        const updateTransactionController = makeUpdateTransactionController()
+        const { statusCode, body } =
+            await updateTransactionController.execute(request)
+
+        return response.status(statusCode).send(body)
+    },
+)
 
 app.listen(process.env.PORT, async () =>
     console.log(`Listening on port ${process.env.PORT}`),
