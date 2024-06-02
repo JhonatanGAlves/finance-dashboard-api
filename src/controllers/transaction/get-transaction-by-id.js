@@ -25,7 +25,7 @@ export class GetTransactionByIdController {
 
             if (!transaction) {
                 return notFound({
-                    message: 'Transaction not found',
+                    message: 'Transaction not found.',
                 })
             }
 
