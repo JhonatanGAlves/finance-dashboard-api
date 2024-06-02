@@ -1,9 +1,11 @@
+import { UserNotFoundError } from '../../errors/user.js'
 import {
-    notFound,
     ok,
     serverError,
     checkIfIdIsValid,
     invalidIdResponse,
+    badRequest,
+    requiredFieldIsMissingResponse,
 } from '../helpers/index.js'
 
 export class GetTransactionByUserIdController {
@@ -13,26 +15,27 @@ export class GetTransactionByUserIdController {
 
     async execute(httpRequest) {
         try {
-            const isValidId = checkIfIdIsValid(httpRequest.params.transactionId)
+            const userId = httpRequest.query.userId
+            if (!userId) {
+                return requiredFieldIsMissingResponse('userId')
+            }
+            const isValidId = checkIfIdIsValid(userId)
 
             if (!isValidId) {
                 return invalidIdResponse()
             }
 
             const transaction =
-                await this.getTransactionByUserIdUseCase.execute(
-                    httpRequest.params.transactionId,
-                )
-
-            if (!transaction) {
-                return notFound({
-                    message: 'Transaction not found.',
-                })
-            }
+                await this.getTransactionByUserIdUseCase.execute(userId)
 
             return ok(transaction)
         } catch (error) {
             console.error(error)
+            if (error instanceof UserNotFoundError) {
+                return badRequest({
+                    message: error.message,
+                })
+            }
             return serverError()
         }
     }
