@@ -21,7 +21,7 @@ const execMigrations = async () => {
             const filePath = path.join(__dirname, file)
             const script = fs.readFileSync(filePath, 'utf-8')
 
-            await client.query(script)
+            client.query(script)
 
             console.log(`Migration for file ${file} executed successfully.`)
         }
