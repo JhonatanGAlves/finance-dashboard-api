@@ -1,14 +1,7 @@
-import validator from 'validator'
-import {
-    badRequest,
-    checkIfIdIsValid,
-    created,
-    invalidIdResponse,
-    requiredFieldIsMissingResponse,
-    serverError,
-    validateRequiredFields,
-} from '../helpers/index.js'
+import { badRequest, created, serverError } from '../helpers/index.js'
 import { UserNotFoundError } from '../../errors/user.js'
+import { createTransactionSchema } from '../../schemas/index.js'
+import { ZodError } from 'zod'
 
 export class CreateTransactionController {
     constructor(crateTransactionUseCase) {
@@ -19,56 +12,19 @@ export class CreateTransactionController {
         const params = httpRequest.body
 
         try {
-            const requiredFields = ['user_id', 'name', 'date', 'amount', 'type']
-            const { ok: requiredFieldsWereProvided, missingField } =
-                validateRequiredFields(params, requiredFields)
-
-            if (!requiredFieldsWereProvided) {
-                return requiredFieldIsMissingResponse(missingField)
-            }
-
-            const userId = params.user_id
-            const isValidId = checkIfIdIsValid(userId)
-
-            if (!isValidId) {
-                return invalidIdResponse()
-            }
-
-            const isValidAmount = validator.isCurrency(
-                params.amount.toString(),
-                {
-                    digits_after_decimal: [2],
-                    allow_negatives: false,
-                    decimal_separator: '.',
-                },
-            )
-
-            if (!isValidAmount) {
-                return badRequest({
-                    message: 'The amount must be a valid currency.',
-                })
-            }
-
-            const type = params.type.trim().toUpperCase()
-
-            const isValidType = ['EARNING', 'EXPENSE', 'INVESTMENT'].includes(
-                type,
-            )
-
-            if (!isValidType) {
-                return badRequest({
-                    message: 'The must be EARNING, EXPENSE or INVESTMENT.',
-                })
-            }
+            await createTransactionSchema.parseAsync(params)
 
             const createdTransaction =
-                await this.crateTransactionUseCase.execute({
-                    ...params,
-                    type,
-                })
+                await this.crateTransactionUseCase.execute(params)
 
             return created(createdTransaction)
         } catch (error) {
+            if (error instanceof ZodError) {
+                return badRequest({
+                    message: error.errors[0].message,
+                })
+            }
+
             if (params.user_id && error instanceof UserNotFoundError) {
                 return badRequest({
                     message: error.message,
