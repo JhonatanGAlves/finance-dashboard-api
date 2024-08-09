@@ -1,4 +1,4 @@
-import validator from 'validator'
+import { ZodError } from 'zod'
 
 import {
     badRequest,
@@ -8,6 +8,7 @@ import {
     serverError,
 } from '../helpers/index.js'
 import { UserNotFoundError } from '../../errors/user.js'
+import { updateTransactionSchema } from '../../schemas/transaction.js'
 
 export class UpdateTransactionController {
     constructor(updateTransactionUseCase) {
@@ -18,18 +19,6 @@ export class UpdateTransactionController {
         const params = httpRequest.body
 
         try {
-            const allowedFields = ['name', 'date', 'amount', 'type']
-
-            const someFieldIsNotAllowed = Object.keys(params).some(
-                (field) => !allowedFields.includes(field),
-            )
-
-            if (someFieldIsNotAllowed) {
-                return badRequest({
-                    message: 'Some provided field is not allowed.',
-                })
-            }
-
             const transactionId = httpRequest.params.transactionId
             const isValidId = checkIfIdIsValid(transactionId)
 
@@ -37,41 +26,22 @@ export class UpdateTransactionController {
                 return invalidIdResponse()
             }
 
-            const isValidAmount = validator.isCurrency(
-                params.amount.toString(),
-                {
-                    digits_after_decimal: [2],
-                    allow_negatives: false,
-                    decimal_separator: '.',
-                },
-            )
-
-            if (!isValidAmount) {
-                return badRequest({
-                    message: 'The amount must be a valid currency.',
-                })
-            }
-
-            const type = params.type.trim().toUpperCase()
-
-            const isValidType = ['EARNING', 'EXPENSE', 'INVESTMENT'].includes(
-                type,
-            )
-
-            if (!isValidType) {
-                return badRequest({
-                    message: 'The must be EARNING, EXPENSE or INVESTMENT.',
-                })
-            }
+            await updateTransactionSchema.parseAsync(params)
 
             const updatedTransaction =
-                await this.updateTransactionUseCase.execute(transactionId, {
-                    ...params,
-                    type,
-                })
+                await this.updateTransactionUseCase.execute(
+                    transactionId,
+                    params,
+                )
 
             return created(updatedTransaction)
         } catch (error) {
+            if (error instanceof ZodError) {
+                return badRequest({
+                    message: error.errors[0].message,
+                })
+            }
+
             if (params.user_id && error instanceof UserNotFoundError) {
                 return badRequest({
                     message: error.message,
