@@ -1,7 +1,8 @@
+import { ZodError } from 'zod'
+
 import { badRequest, created, serverError } from '../helpers/index.js'
 import { UserNotFoundError } from '../../errors/user.js'
 import { createTransactionSchema } from '../../schemas/index.js'
-import { ZodError } from 'zod'
 
 export class CreateTransactionController {
     constructor(crateTransactionUseCase) {
