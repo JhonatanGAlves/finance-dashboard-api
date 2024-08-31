@@ -47,7 +47,7 @@ app.delete('/api/users/delete/:userId', async (request, response) => {
     return response.status(statusCode).send(body)
 })
 
-app.get('/api/:userId/balance', async (request, response) => {
+app.get('/api/users/:userId/balance', async (request, response) => {
     const getUserBalanceController = makeUserBalanceController()
     const { statusCode, body } = await getUserBalanceController.execute(request)
 
